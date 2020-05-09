@@ -1,15 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C59DC49D-7C88-4BAC-BDF1-BB9CCFA6071C}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		LICENSE = LICENSE
 		README.md = README.md
+		GenerateLogs\singlefilebuild.cmd = GenerateLogs\singlefilebuild.cmd
+		GenerateLogs\singlefilebuild.sh = GenerateLogs\singlefilebuild.sh
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateLogs", "GenerateLogs\GenerateLogs.csproj", "{471F77BF-747D-4781-AAB7-CF4D39D7D642}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateLogs", "GenerateLogs\GenerateLogs.csproj", "{471F77BF-747D-4781-AAB7-CF4D39D7D642}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

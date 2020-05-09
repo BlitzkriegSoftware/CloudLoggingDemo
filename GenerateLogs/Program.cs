@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
 
 namespace GenerateLogs
 {
@@ -29,7 +27,6 @@ namespace GenerateLogs
         {
             // Configuration
             var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddEnvironmentVariables();
             if (args != null && args.Length > 0)
             {
                 configurationBuilder.AddCommandLine(args);

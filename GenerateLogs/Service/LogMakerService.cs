@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace GenerateLogs.Service
@@ -10,47 +8,69 @@ namespace GenerateLogs.Service
     public class LogMakerService : ILogMakerService
     {
         private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IConfigurationRoot _config;
+        private readonly BlitzkriegSoftware.SecureRandomLibrary.SecureRandom Dice = new BlitzkriegSoftware.SecureRandomLibrary.SecureRandom();
+
 
         // Notice the new method requires ILogger of T, not ILogger
-        public LogMakerService(ILogger<LogMakerService> logger, IConfigurationRoot config)
+        public LogMakerService(ILoggerFactory loggerFactory, IConfigurationRoot config)
         {
-            _logger = logger;
-            _config = config;
+            this._loggerFactory = loggerFactory;
+            this._logger = loggerFactory.CreateLogger<LogMakerService>();
+            this._config = config;
         }
 
         public void Run()
         {
-            for(int i=0; i<Loops; i++)
+            this.DumpConfig(this._loggerFactory.CreateLogger("ConfigDumper"));
+
+            for (int i=0; i< this.Loops; i++)
             {
-                DumpConfig();
-                MakeLogs();
-                Thread.Sleep(Wait);
+                this.MakeLogs();
+                Thread.Sleep(this.Wait);
             }
         }
 
-        private void DumpConfig()
+        private void DumpConfig(ILogger logger)
         {
-            foreach(var c in _config.AsEnumerable())
+            foreach(var c in this._config.AsEnumerable())
             {
-                _logger.LogDebug("{0}: {1}", c.Key, c.Value);
+                logger.LogDebug("{0}: {1}", c.Key, c.Value);
             }
         }
 
         private void MakeLogs()
         {
-            var ex0 = new StackOverflowException("Faux Overflow");
-            _logger.LogCritical(ex0, "{0}", ex0.Message);
+            var index = this.Dice.Next(1, 100);
+            Exception ex0;
 
-            var ex1 = new InvalidOperationException("This is a test");
-            _logger.LogError(ex1, "{0}", ex1.Message);
-
-            var ex2 = new ArgumentOutOfRangeException("fake", -1, "Must be 1..100");
-            _logger.LogWarning(ex2, "{0}", ex2.Message);
-
-            _logger.LogInformation("This is information");
-
-            _logger.LogDebug("Debug");
+            switch(index)
+            {
+                case int n when (n < 10):
+                     ex0 = new Models.RequiredConfigurationMissingException("ConfigKeyA", "Application will not run correctly!");
+                    this._logger.LogCritical(ex0, "{0}", ex0.ToString());
+                    break;
+                case int n when (n >= 10 && n < 20):
+                    ex0 = new Models.RequiredConfigurationBadValueException("ConfigKeyA", -20, "Application will not run correctly until this key has a valid value supplied (expected (int) 1-1000)");
+                    this._logger.LogCritical(ex0, "{0}", ex0.ToString());
+                    break;
+                case int n when (n >= 20 && n < 40):
+                    ex0 = new InvalidOperationException("The code did a bad thing, this is why... Process will not crash, but a unit of work may have been lost");
+                    this._logger.LogError(ex0, "{0}", ex0.ToString());
+                    break;
+                case int n when (n >= 40 && n < 50):
+                    ex0 = new TimeoutException("It took a couple of tries, but it worked eventually");
+                    this._logger.LogWarning(ex0, "{0}", ex0.ToString());
+                    break;
+                case int n when (n >= 50 && n < 70):
+                    this._logger.LogInformation("This is information for **Business** Users, do not mis-use this for developer messages...");
+                    break;
+                case int n when (n >= 70 && n < 80):
+                    this._logger.LogDebug("Debug (coarse debugging) for Developers");
+                    break;
+                default: this._logger.LogTrace("Trace (very detailed debugging) For Developers"); break;
+            }
         }
 
         /// <summary>
@@ -60,8 +80,7 @@ namespace GenerateLogs.Service
         {
             get
             {
-                int loop = 1;
-                loop = _config.GetValue<int>("loop");
+                int loop = this._config.GetValue<int>("loop", 3);
                 return loop;
             }
         }
@@ -73,10 +92,10 @@ namespace GenerateLogs.Service
         {
             get
             {
-                int wait = 1000;
-                wait = _config.GetValue<int>("wait");
+                int wait = this._config.GetValue<int>("wait", 200);
                 return wait;
             }
         }
+
     }
 }

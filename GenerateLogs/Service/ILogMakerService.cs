@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GenerateLogs.Service
+﻿namespace GenerateLogs.Service
 {
     public interface ILogMakerService
     {
